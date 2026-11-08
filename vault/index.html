@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AndroidID Vault – Tools, Modul, ROM & Recovery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#e9eef2;--surface:#f6f9fb;--ink:#12202b;--mute:#52636f;--line:#c6d2da;--acc:#0b7a5a;--acc-ink:#fff;--warn:#8a5200;--warnbg:#fbefd8;
+--f-head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a22;--surface:#16252f;--ink:#e6eef3;--mute:#9fb2bf;--line:#2b404d;--acc:#3ddc97;--acc-ink:#06241a;--warn:#f1c27a;--warnbg:#2c2414}}
+:root[data-theme="dark"]{--bg:#0f1a22;--surface:#16252f;--ink:#e6eef3;--mute:#9fb2bf;--line:#2b404d;--acc:#3ddc97;--acc-ink:#06241a;--warn:#f1c27a;--warnbg:#2c2414}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--f-body)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px}
+header.top{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.brand{font:800 20px var(--f-head);letter-spacing:-.01em}
+.brand span{color:var(--acc)}
+.top small{color:var(--mute);font-size:13px}
+.hero{padding:22px 0 8px}
+h1{font:800 clamp(34px,8vw,60px)/1.02 var(--f-head);letter-spacing:-.03em;margin:0 0 14px;max-width:14ch}
+.lead{color:var(--mute);max-width:56ch;margin:0 0 26px}
+.path{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.path button{all:unset;cursor:pointer;padding:12px 12px 14px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.path button:last-child{border-right:0}
+.path button:focus-visible{outline:3px solid var(--acc);outline-offset:-3px}
+.path b{font:600 12px var(--f-mono);color:var(--mute)}
+.path strong{font:600 15px var(--f-head)}
+.path em{font-style:normal;font-size:12.5px;color:var(--mute);line-height:1.35}
+.path button[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
+.path button[aria-pressed="true"] b,.path button[aria-pressed="true"] em{color:inherit;opacity:.85}
+.warn{margin:22px 0;padding:12px 14px;background:var(--warnbg);color:var(--warn);border-left:4px solid var(--warn);border-radius:4px;font-size:14.5px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 12px}
+.bar input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{all:unset;cursor:pointer;padding:6px 12px;border:1px solid var(--line);border-radius:99px;font-size:14px;background:var(--surface)}
+.chip:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.count{color:var(--mute);font-size:13.5px;margin:0 0 6px}
+ul.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:16px 0;border-bottom:1px solid var(--line)}
+.row input{width:20px;height:20px;margin-top:3px;accent-color:var(--acc)}
+.row h3{margin:0;font:600 18px var(--f-head)}
+.row p{margin:3px 0 8px;color:var(--mute);font-size:14.5px;max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px}
+.tag{padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--mute)}
+.tag.type{background:var(--surface);color:var(--ink);font-weight:500}
+.tag.dev{font-family:var(--f-mono)}
+.go{align-self:center;text-decoration:none;font-weight:600;font-size:14px;padding:9px 14px;border-radius:8px;background:var(--acc);color:var(--acc-ink);white-space:nowrap}
+.go:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.empty{padding:28px 0;color:var(--mute)}
+.sel{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);margin:16px 0;display:none;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:var(--ink);color:var(--bg);border-radius:10px}
+.sel.on{display:flex}
+.sel button{all:unset;cursor:pointer;padding:8px 14px;border-radius:7px;background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:14px}
+.sel button:focus-visible{outline:3px solid var(--bg);outline-offset:2px}
+section.extra{margin:34px 0 10px;display:grid;gap:22px}
+.extra h2{font:800 22px var(--f-head);margin:0 0 6px;letter-spacing:-.01em}
+.extra p{margin:0 0 8px;color:var(--mute);max-width:62ch}
+pre{margin:0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow-x:auto;font:400 13.5px/1.6 var(--f-mono)}
+textarea{width:100%;min-height:90px;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;resize:vertical}
+footer{padding:26px 0 40px;color:var(--mute);font-size:13px;border-top:1px solid var(--line);margin-top:30px}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media(max-width:560px){.path{grid-template-columns:1fr 1fr}.path button:nth-child(2){border-right:0}.path button:nth-child(-n+2){border-bottom:1px solid var(--line)}.row{grid-template-columns:auto 1fr}.go{grid-column:2;justify-self:start}}
+.tip{margin:10px 0 4px;padding:10px 12px;border-left:4px solid var(--acc);background:var(--surface);font-size:14.5px;max-width:64ch}.tip:empty{display:none}.devs{margin-top:10px}#lang,#acc{font-weight:600}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand">Android<span>ID</span> Vault</div><div class="chips"><a class="chip" id="acc" href="/account/">Akun</a><button type="button" class="chip" id="lang" aria-label="Ganti bahasa / Switch language">EN</button></div></header>
+
+<div class="hero">
+<h1>Dari bootloader sampai ROM, dalam satu daftar.</h1>
+<p class="lead">Kumpulan tautan resmi untuk membuka bootloader, root, memasang custom ROM dan recovery, serta memperbaiki integritas perangkat. Semua file diunduh langsung dari sumber aslinya.</p>
+<div class="path" role="group" aria-label="Filter berdasarkan tahap">
+<button type="button" data-stage="ubl" aria-pressed="false"><b>1</b><strong>Buka bootloader</strong><em>UBL, ADB, fastboot</em></button>
+<button type="button" data-stage="root" aria-pressed="false"><b>2</b><strong>Root</strong><em>Magisk, KernelSU</em></button>
+<button type="button" data-stage="rom" aria-pressed="false"><b>3</b><strong>Recovery & ROM</strong><em>TWRP, LineageOS</em></button>
+<button type="button" data-stage="integrity" aria-pressed="false"><b>4</b><strong>Integritas</strong><em>Play Integrity</em></button>
+</div>
+</div>
+
+<div class="warn"><strong>Baca dulu.</strong> Membuka bootloader menghapus semua data dan dapat membatalkan garansi. Cadangkan data, pastikan file cocok dengan tipe dan model perangkatmu, dan jangan lanjut jika tidak yakin. Risiko ditanggung sendiri.</div>
+
+<div class="chips devs" id="devs" role="group" aria-label="Perangkat"></div>
+<div class="tip" id="tip" aria-live="polite"></div>
+<div class="bar">
+<input type="search" id="q" placeholder="Cari nama, misalnya Magisk atau TWRP" aria-label="Cari file">
+</div>
+<div class="chips" id="types" role="group" aria-label="Filter berdasarkan jenis"></div>
+<p class="count" id="count" aria-live="polite"></p>
+<ul class="list" id="list"></ul>
+<div class="sel" id="sel"><span id="selN"></span><button type="button" id="copy">Salin tautan terpilih</button></div>
+
+<section class="extra">
+<div>
+<h2>Perintah dasar fastboot</h2>
+<p>Setelah ADB dan fastboot terpasang, urutan umum untuk membuka bootloader. Beberapa merek memerlukan izin atau kode dari pabrikan terlebih dahulu.</p>
+<pre>adb reboot bootloader
+fastboot devices
+fastboot flashing unlock
+fastboot reboot</pre>
+</div>
+<div>
+<h2>Catatan perangkat</h2>
+<p>Tulis model, versi ROM, dan langkah yang sudah kamu coba. Catatan tersimpan di browser ini saja.</p>
+<textarea id="note" aria-label="Catatan perangkat" placeholder="Contoh: Redmi Note 11, bootloader sudah terbuka, ROM terakhir A13"></textarea>
+</div>
+</section>
+
+<footer>AndroidID Vault hanya mengarahkan ke sumber resmi dan tidak menyimpan file sendiri. Selalu periksa checksum atau tanda tangan di halaman sumber sebelum memasang. Nama produk adalah milik pemiliknya masing-masing.</footer>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+var ITEMS=[
+{n:"Platform-Tools (ADB & Fastboot)",t:"Tools",s:"ubl",d:"Paket resmi Google berisi adb dan fastboot, dasar untuk hampir semua langkah oprek.",u:"https://developer.android.com/tools/releases/platform-tools",src:"developer.android.com"},
+{n:"Panduan buka dan kunci bootloader",t:"Panduan",s:"ubl",d:"Dokumentasi AOSP tentang cara kerja kunci bootloader dan perintah dasarnya.",u:"https://source.android.com/docs/core/architecture/bootloader/locking_unlocking",src:"source.android.com"},
+{n:"mtkclient",t:"Tools",s:"ubl",d:"Alat untuk ponsel MediaTek: baca dan tulis partisi, bantu buka bootloader pada perangkat tertentu.",u:"https://github.com/bkerler/mtkclient",src:"GitHub"},
+{n:"scrcpy",t:"Tools",s:"ubl",d:"Tampilkan dan kendalikan layar ponsel dari komputer lewat USB atau Wi-Fi, berguna saat layar rusak.",u:"https://github.com/Genymobile/scrcpy",src:"GitHub"},
+{n:"Magisk",t:"Modul",s:"root",d:"Solusi root berbasis patch boot image dengan dukungan modul.",u:"https://github.com/topjohnwu/Magisk/releases",src:"GitHub"},
+{n:"KernelSU",t:"Modul",s:"root",d:"Root di level kernel dengan manajer izin per aplikasi. Perlu kernel yang didukung.",u:"https://github.com/tiann/KernelSU",src:"GitHub"},
+{n:"LSPosed",t:"Modul",s:"root",d:"Kerangka kerja untuk memasang modul yang mengubah perilaku aplikasi dan sistem.",u:"https://github.com/LSPosed/LSPosed/releases",src:"GitHub"},
+{n:"Play Integrity Fork",t:"Modul",s:"integrity",d:"Modul untuk membantu perangkat lolos pemeriksaan Play Integrity setelah root atau bootloader terbuka.",u:"https://github.com/osm0sis/PlayIntegrityFork",src:"GitHub"},
+{n:"Tricky Store",t:"Modul",s:"integrity",d:"Modul pendukung attestation kunci perangkat untuk memperbaiki integritas pada Android modern.",u:"https://github.com/5ec1cff/TrickyStore",src:"GitHub"},
+{n:"TWRP",t:"Recovery",s:"rom",d:"Recovery kustom populer untuk flash ZIP, backup, dan restore. Pilih berdasarkan model perangkat.",u:"https://twrp.me/Devices/",src:"twrp.me"},
+{n:"OrangeFox Recovery",t:"Recovery",s:"rom",d:"Recovery kustom dengan antarmuka modern dan fitur tambahan, tersedia untuk banyak perangkat.",u:"https://orangefox.download",src:"orangefox.download"},
+{n:"PitchBlack Recovery",t:"Recovery",s:"rom",d:"Recovery berbasis TWRP dengan tampilan dan fitur tambahan untuk perangkat yang didukung.",u:"https://pitchblackrecovery.com",src:"pitchblackrecovery.com"},
+{n:"Heimdall",t:"Tools",s:"rom",d:"Alat flash sumber terbuka untuk perangkat Samsung sebagai alternatif Odin di Linux dan macOS.",u:"https://github.com/Benjamin-Dobell/Heimdall",src:"GitHub"},
+{n:"LineageOS",t:"ROM",s:"rom",d:"Custom ROM berbasis AOSP dengan dukungan perangkat sangat luas dan pembaruan rutin.",u:"https://download.lineageos.org",src:"download.lineageos.org"},
+{n:"crDroid",t:"ROM",s:"rom",d:"ROM berbasis LineageOS dengan banyak opsi kustomisasi.",u:"https://crdroid.net/downloads",src:"crdroid.net"},
+{n:"GrapheneOS",t:"ROM",s:"rom",d:"ROM fokus keamanan dan privasi, khusus perangkat Pixel. Tersedia pemasang berbasis web.",u:"https://grapheneos.org/install/",src:"grapheneos.org"}
+];
+var TYPES=["Semua","Tools","Modul","Recovery","ROM","Panduan"];
+var st={stage:"",type:"Semua",q:"",sel:{},dev:"",lang:"id"};
+var D={id:{found:"file ditemukan",open:"Buka sumber",none:"Tidak ada hasil. Hapus filter atau ubah kata kunci pencarian.",chosen:"dipilih",copy:"Salin tautan terpilih",copied:"Tautan disalin",fail:"Gagal menyalin",alldev:"Semua perangkat"},en:{found:"files found",open:"Open source",none:"No results. Clear the filters or change your search.",chosen:"selected",copy:"Copy selected links",copied:"Links copied",fail:"Copy failed",alldev:"All devices"}};
+var TL={Semua:"All",Modul:"Modules",Panduan:"Guide"};
+var DEV={"mtkclient":["xiaomi"],"OrangeFox Recovery":["xiaomi"],"PitchBlack Recovery":["xiaomi"],"Heimdall":["samsung"],"GrapheneOS":["pixel"]};
+var DEVS=["xiaomi","samsung","pixel"],DEVN={xiaomi:"Xiaomi",samsung:"Samsung",pixel:"Pixel"};
+var TIPS={xiaomi:{id:"Xiaomi: ikat akun Mi ke perangkat di Opsi Pengembang, lalu pakai alat Mi Unlock resmi. Biasanya ada masa tunggu sebelum bootloader bisa dibuka.",en:"Xiaomi: bind a Mi account to the device in Developer options, then use the official Mi Unlock tool. There is usually a waiting period before unlocking."},samsung:{id:"Samsung: aktifkan OEM Unlocking di Opsi Pengembang, lalu buka lewat mode download. Knox akan terpicu permanen dan sebagian fitur seperti Samsung Pay bisa berhenti.",en:"Samsung: enable OEM Unlocking in Developer options, then unlock from download mode. Knox is tripped permanently and some features such as Samsung Pay may stop working."},pixel:{id:"Pixel: aktifkan OEM Unlocking di Opsi Pengembang, lalu jalankan fastboot flashing unlock. Varian yang dikunci operator, misalnya Verizon, tidak bisa dibuka.",en:"Pixel: enable OEM Unlocking in Developer options, then run fastboot flashing unlock. Carrier-locked variants, such as Verizon, cannot be unlocked."}};
+var EN=["Official Google package with adb and fastboot, the base for almost every modding step.","AOSP documentation on how the bootloader lock works and its basic commands.","Tool for MediaTek phones: read and write partitions, helps unlock the bootloader on some devices.","Show and control your phone screen from a computer over USB or Wi-Fi, handy when the screen is broken.","Root solution based on patching the boot image, with module support.","Kernel-level root with per-app permission manager. Needs a supported kernel.","Framework for installing modules that change app and system behavior.","Module that helps a device pass Play Integrity checks after root or an unlocked bootloader.","Module supporting device key attestation to fix integrity on modern Android.","Popular custom recovery for flashing ZIPs, backup and restore. Pick by device model.","Custom recovery with a modern interface and extra features, available for many devices.","TWRP-based recovery with extra looks and features for supported devices.","Open-source flashing tool for Samsung devices, an alternative to Odin on Linux and macOS.","AOSP-based custom ROM with very wide device support and regular updates.","LineageOS-based ROM with many customization options.","Security and privacy focused ROM, Pixel devices only. A web-based installer is available."];
+var UI=[[".hero h1","Dari bootloader sampai ROM, dalam satu daftar.","From bootloader to ROM, in one list."],[".lead","Kumpulan tautan resmi untuk membuka bootloader, root, memasang custom ROM dan recovery, serta memperbaiki integritas perangkat. Semua file diunduh langsung dari sumber aslinya.","Official links for unlocking the bootloader, rooting, installing custom ROMs and recoveries, and fixing device integrity. Every file is downloaded straight from its original source."],[".warn","<strong>Baca dulu.</strong> Membuka bootloader menghapus semua data dan dapat membatalkan garansi. Cadangkan data, pastikan file cocok dengan tipe dan model perangkatmu, dan jangan lanjut jika tidak yakin. Risiko ditanggung sendiri.","<strong>Read first.</strong> Unlocking the bootloader erases all data and may void your warranty. Back up your data, make sure files match your exact device model, and stop if you are unsure. Use at your own risk."],["footer","AndroidID Vault hanya mengarahkan ke sumber resmi dan tidak menyimpan file sendiri. Selalu periksa checksum atau tanda tangan di halaman sumber sebelum memasang. Nama produk adalah milik pemiliknya masing-masing.","AndroidID Vault only points to official sources and hosts no files itself. Always check the checksum or signature on the source page before installing. Product names belong to their respective owners."],[".extra>div:nth-child(1) h2","Perintah dasar fastboot","Basic fastboot commands"],[".extra>div:nth-child(1) p","Setelah ADB dan fastboot terpasang, urutan umum untuk membuka bootloader. Beberapa merek memerlukan izin atau kode dari pabrikan terlebih dahulu.","Once ADB and fastboot are installed, this is the usual order to unlock the bootloader. Some brands need permission or a code from the manufacturer first."],[".extra>div:nth-child(2) h2","Catatan perangkat","Device notes"],[".extra>div:nth-child(2) p","Tulis model, versi ROM, dan langkah yang sudah kamu coba. Catatan tersimpan di browser ini saja.","Write your model, ROM version, and the steps you have tried. Notes are saved in this browser only."]];
+var PATH=[["Buka bootloader","UBL, ADB, fastboot","Unlock bootloader"],["Root","Magisk, KernelSU","Root"],["Recovery & ROM","TWRP, LineageOS","Recovery & ROM"],["Integritas","Play Integrity","Integrity"]];
+function L(k){return D[st.lang][k]}
+function tl(t){return st.lang==="en"&&TL[t]?TL[t]:t}
+function desc(x){return st.lang==="en"?EN[ITEMS.indexOf(x)]:x.d}
+function devOk(x){var m=DEV[x.n];return !st.dev||!m||m.indexOf(st.dev)>-1}
+function buildTypes(){$("types").innerHTML=TYPES.map(function(t){return '<button type="button" class="chip" data-type="'+t+'" aria-pressed="'+(t===st.type)+'">'+tl(t)+'</button>'}).join("")}
+function buildDevs(){$("devs").innerHTML=[""].concat(DEVS).map(function(d){return '<button type="button" class="chip" data-dev="'+d+'" aria-pressed="'+(d===st.dev)+'">'+(d?DEVN[d]:L("alldev"))+'</button>'}).join("")}
+function apply(){var en=st.lang==="en";document.documentElement.lang=st.lang;UI.forEach(function(u){var e=document.querySelector(u[0]);if(e)e.innerHTML=en?u[2]:u[1]});PATH.forEach(function(p,i){var b=document.querySelectorAll(".path button")[i];b.querySelector("strong").textContent=en?p[2]:p[0];b.querySelector("em").textContent=p[1]});$("q").placeholder=en?"Search, e.g. Magisk or TWRP":"Cari nama, misalnya Magisk atau TWRP";$("note").placeholder=en?"Example: Redmi Note 11, bootloader unlocked, last ROM A13":"Contoh: Redmi Note 11, bootloader sudah terbuka, ROM terakhir A13";$("lang").textContent=en?"ID":"EN";$("acc").textContent=en?"Account":"Akun";$("tip").textContent=st.dev?TIPS[st.dev][st.lang]:"";buildTypes();buildDevs();render()}
+var $=function(i){return document.getElementById(i)};
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on")},1800)}
+function esc(s){return s.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function render(){
+ var q=st.q.toLowerCase();
+ var rows=ITEMS.filter(function(x){return(!st.stage||x.s===st.stage)&&devOk(x)&&(st.type==="Semua"||x.t===st.type)&&(!q||(x.n+" "+x.d).toLowerCase().indexOf(q)>-1)});
+ $("count").textContent=rows.length+" "+L("found");
+ $("list").innerHTML=rows.length?rows.map(function(x){
+  var i=ITEMS.indexOf(x);
+  return '<li class="row"><input type="checkbox" data-i="'+i+'" aria-label="Pilih '+esc(x.n)+'"'+(st.sel[i]?' checked':'')+'><div><h3>'+esc(x.n)+'</h3><p>'+esc(desc(x))+'</p><div class="meta"><span class="tag type">'+x.t+'</span><span class="tag dev">'+esc(x.src)+'</span></div></div><a class="go" href="'+x.u+'" target="_blank" rel="noopener noreferrer">'+L("open")+'</a></li>'
+ }).join(""):'<li class="empty">'+L("none")+'</li>';
+ var n=Object.keys(st.sel).filter(function(k){return st.sel[k]}).length;
+ $("sel").classList.toggle("on",n>0);$("selN").textContent=n+" "+L("chosen");$("copy").textContent=L("copy");
+}
+buildTypes();
+$("types").addEventListener("click",function(e){var b=e.target.closest("[data-type]");if(!b)return;st.type=b.dataset.type;[].forEach.call($("types").children,function(c){c.setAttribute("aria-pressed",c===b)});render()});
+document.querySelector(".path").addEventListener("click",function(e){var b=e.target.closest("[data-stage]");if(!b)return;var on=b.getAttribute("aria-pressed")==="true";st.stage=on?"":b.dataset.stage;[].forEach.call(document.querySelectorAll(".path button"),function(c){c.setAttribute("aria-pressed",!on&&c===b)});render()});
+$("q").addEventListener("input",function(e){st.q=e.target.value;render()});
+$("list").addEventListener("change",function(e){var i=e.target.dataset.i;if(i!==undefined){st.sel[i]=e.target.checked;render()}});
+$("copy").addEventListener("click",function(){
+ var txt=Object.keys(st.sel).filter(function(k){return st.sel[k]}).map(function(k){return ITEMS[k].n+": "+ITEMS[k].u}).join("\n");
+ try{navigator.clipboard.writeText(txt).then(function(){toast(L("copied"))},function(){toast(L("fail"))})}catch(err){toast(L("fail"))}
+});
+try{var nv=localStorage.getItem("aid-note");if(nv)$("note").value=nv}catch(e){}
+$("note").addEventListener("input",function(e){try{localStorage.setItem("aid-note",e.target.value)}catch(err){}});
+$("devs").addEventListener("click",function(e){var b=e.target.closest("[data-dev]");if(!b)return;st.dev=b.dataset.dev;apply()});
+$("lang").addEventListener("click",function(){st.lang=st.lang==="id"?"en":"id";try{localStorage.setItem("aid-lang",st.lang)}catch(e){}apply()});
+try{var lg=localStorage.getItem("aid-lang");if(lg==="en"||lg==="id")st.lang=lg}catch(e){}
+apply();
+</script>
+</body>
+</html>

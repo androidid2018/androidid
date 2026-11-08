@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Akun – AndroidID Vault</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#e9eef2;--surface:#f6f9fb;--ink:#12202b;--mute:#52636f;--line:#c6d2da;--acc:#0b7a5a;--acc-ink:#fff;--err:#a12121;
+--f-head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a22;--surface:#16252f;--ink:#e6eef3;--mute:#9fb2bf;--line:#2b404d;--acc:#3ddc97;--acc-ink:#06241a;--err:#ff8a8a}}
+:root[data-theme="dark"]{--bg:#0f1a22;--surface:#16252f;--ink:#e6eef3;--mute:#9fb2bf;--line:#2b404d;--acc:#3ddc97;--acc-ink:#06241a;--err:#ff8a8a}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--f-body)}
+.wrap{max-width:440px;margin:0 auto;padding:22px 18px 48px}
+a{color:var(--acc)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+h1{font:800 34px/1.05 var(--f-head);letter-spacing:-.02em;margin:18px 0 8px}
+p{color:var(--mute);margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:100px;resize:vertical}
+button.main{margin-top:16px;width:100%;padding:12px;border:0;border-radius:8px;background:var(--acc);color:var(--acc-ink);font:600 16px var(--f-body);cursor:pointer}
+button.link{all:unset;cursor:pointer;color:var(--acc);font-weight:600;font-size:14.5px;margin-top:14px;display:inline-block}
+button.link:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button:disabled{opacity:.6;cursor:wait}
+#msg{min-height:1.5em;margin:12px 0 0;font-size:14.5px}
+#msg.err{color:var(--err)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a href="/vault">Kembali ke Vault</a>
+<h1 id="title">Masuk</h1>
+<p id="sub">Simpan perangkat dan catatanmu agar bisa dibuka dari ponsel atau komputer lain.</p>
+
+<div class="card" id="setup" hidden>
+<strong>Supabase belum diatur.</strong>
+<p style="margin:6px 0 0">Isi SUPABASE_URL dan SUPABASE_ANON_KEY di bagian script halaman ini, lalu muat ulang.</p>
+</div>
+
+<div class="card hide" id="authBox">
+<form id="authForm">
+<label for="email">Email</label>
+<input id="email" type="email" autocomplete="email" required>
+<label for="pw">Kata sandi</label>
+<input id="pw" type="password" autocomplete="current-password" minlength="8" required>
+<button class="main" id="go" type="submit">Masuk</button>
+</form>
+<button class="link" id="swap" type="button">Belum punya akun? Daftar</button>
+</div>
+
+<div class="card hide" id="profBox">
+<p id="who" style="margin-bottom:4px"></p>
+<form id="profForm">
+<label for="dev">Perangkat utama</label>
+<select id="dev">
+<option value="">Belum dipilih</option>
+<option value="xiaomi">Xiaomi</option>
+<option value="samsung">Samsung</option>
+<option value="pixel">Pixel</option>
+<option value="lain">Lainnya</option>
+</select>
+<label for="note">Catatan perangkat</label>
+<textarea id="note" placeholder="Contoh: Redmi Note 11, bootloader sudah terbuka, ROM terakhir A13"></textarea>
+<button class="main" id="save" type="submit">Simpan profil</button>
+</form>
+<button class="link" id="out" type="button">Keluar</button>
+</div>
+
+<p id="msg" role="status"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* Isi dengan data dari Supabase: Project Settings > API.
+   Anon key memang publik; keamanan data dijaga oleh Row Level Security. */
+var SUPABASE_URL="https://YOUR-PROJECT.supabase.co";
+var SUPABASE_ANON_KEY="YOUR-ANON-KEY";
+
+var $=function(i){return document.getElementById(i)};
+var ready=SUPABASE_URL.indexOf("YOUR-")<0&&SUPABASE_ANON_KEY.indexOf("YOUR-")<0;
+var sb=ready?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+var mode="in",uid=null;
+
+function say(t,err){var m=$("msg");m.textContent=t||"";m.className=err?"err":""}
+function setMode(m){mode=m;var up=m==="up";$("title").textContent=up?"Daftar":"Masuk";$("go").textContent=up?"Buat akun":"Masuk";$("swap").textContent=up?"Sudah punya akun? Masuk":"Belum punya akun? Daftar";$("pw").autocomplete=up?"new-password":"current-password";say("")}
+function view(session){
+ var on=!!session;uid=on?session.user.id:null;
+ $("authBox").classList.toggle("hide",on);$("profBox").classList.toggle("hide",!on);
+ $("title").textContent=on?"Profil":(mode==="up"?"Daftar":"Masuk");
+ if(on){$("who").textContent=session.user.email;loadProfile()}
+}
+async function loadProfile(){
+ var r=await sb.from("profiles").select("device,note").eq("id",uid).maybeSingle();
+ if(r.error){say("Profil gagal dimuat: "+r.error.message,true);return}
+ $("dev").value=r.data&&r.data.device||"";$("note").value=r.data&&r.data.note||"";
+}
+function busy(b,on){b.disabled=on}
+
+if(!ready){$("setup").hidden=false;$("sub").classList.add("hide")}
+else{
+ $("authBox").classList.remove("hide");
+ $("swap").addEventListener("click",function(){setMode(mode==="in"?"up":"in")});
+ $("authForm").addEventListener("submit",async function(e){
+  e.preventDefault();var b=$("go");busy(b,true);say("");
+  var c={email:$("email").value.trim(),password:$("pw").value};
+  var r=mode==="up"?await sb.auth.signUp(c):await sb.auth.signInWithPassword(c);
+  busy(b,false);
+  if(r.error){say(r.error.message,true);return}
+  if(mode==="up"&&!r.data.session)say("Akun dibuat. Buka email kamu dan klik tautan konfirmasi, lalu masuk.");
+ });
+ $("profForm").addEventListener("submit",async function(e){
+  e.preventDefault();var b=$("save");busy(b,true);say("");
+  var r=await sb.from("profiles").upsert({id:uid,device:$("dev").value,note:$("note").value,updated_at:new Date().toISOString()});
+  busy(b,false);
+  say(r.error?"Gagal menyimpan: "+r.error.message:"Profil disimpan.",!!r.error);
+ });
+ $("out").addEventListener("click",async function(){await sb.auth.signOut();say("")});
+ sb.auth.onAuthStateChange(function(_e,s){view(s)});
+ sb.auth.getSession().then(function(r){view(r.data.session)});
+}
+</script>
+</body>
+</html>
